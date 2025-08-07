@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SudoCell Status</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-green: #00ff00;
+      --dark-bg: #000000;
+      --light-text: #ffffff;
+      --muted-text: rgba(255, 255, 255, 0.7);
+      --surface-bg: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--dark-bg);
+      color: var(--light-text);
+      overflow-x: hidden;
+    }
+
+    .section-container {
+      padding: 80px 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .navbar {
+      padding: 20px 40px;
+      max-width: 1200px;
+      margin: auto;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--light-text);
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logo-symbol {
+      color: var(--neon-green);
+      margin-right: 10px;
+    }
+    
+    .hero-heading {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      margin: 0 0 30px;
+      line-height: 1.1;
+      max-width: 1000px;
+    }
+
+    .hero-sub {
+      font-size: clamp(1.2rem, 3vw, 1.5rem);
+      max-width: 900px;
+      line-height: 1.6;
+      color: var(--muted-text);
+    }
+    
+    .status-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.5);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+    
+    .status-banner::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        background: var(--neon-green);
+        border-radius: 50%;
+        margin-right: 15px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+    }
+
+    .timeline {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .timeline::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      background-color: var(--border-color);
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      margin-left: -1px;
+    }
+
+    .entry {
+      padding: 10px 40px;
+      position: relative;
+      width: 50%;
+      box-sizing: border-box;
+    }
+
+    .entry::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      right: -7px;
+      background-color: var(--dark-bg);
+      border: 3px solid var(--border-color);
+      top: 35px;
+      border-radius: 50%;
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+    
+    .entry:hover::before {
+        background-color: var(--neon-green);
+        border-color: var(--neon-green);
+        transform: scale(1.2);
+    }
+
+    .entry.left::before { left: -7px; }
+    .entry.right { left: 50%; }
+    .entry.left { left: 0; text-align: right; }
+
+    .entry-content {
+      padding: 20px;
+      background: var(--surface-bg);
+      border-radius: 6px;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    
+    .entry:hover .entry-content {
+        transform: translateY(-5px);
+    }
+
+    .entry h3 {
+      margin-top: 0;
+      color: var(--light-text);
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .entry p {
+      color: var(--muted-text);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    .entry p strong, .entry p code {
+        color: var(--light-text);
+        font-weight: 400;
+    }
+    
+    .entry p code {
+        background: rgba(0,0,0,0.2);
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+
+    .entry time {
+      font-size: 14px;
+      color: var(--neon-green);
+      display: block;
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 50px 30px;
+      font-size: 14px;
+      color: var(--muted-text);
+      border-top: 1px solid var(--border-color);
+      padding-bottom: 100px;
+    }
+    
+    @media screen and (max-width: 768px) {
+      .section-container { padding: 60px 20px; }
+      .navbar { padding: 20px; }
+
+      .hero-heading {
+        font-size: 52px;
+      }
+      .hero-sub {
+        font-size: 20px;
+      }
+      
+      .status-banner {
+        width: calc(100% - 40px);
+        box-sizing: border-box;
+      }
+
+      .timeline::after { left: 20px; }
+      .entry, .entry.right, .entry.left {
+        width: 100%;
+        padding-left: 50px;
+        padding-right: 15px;
+        text-align: left;
+      }
+      .entry.right, .entry.left { left: 0; }
+      .entry::before { left: 13px; }
+    }
+  </style>
+</head>
+<body>
+  
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+        <span class="logo-symbol">[#]</span>SudoCell
+    </a>
+  </nav>
+
+  <header class="section-container">
+    <h1 class="hero-heading">Project Status</h1>
+    <p class="hero-sub">
+      Follow the development journey of SudoCell from idea to reality.
+    </p>
+  </header>
+  
+  <div class="status-banner">
+    <strong>Status:</strong> The Naming Quest is Over. Now back to advancing my linux skills.
+  </div>
+
+  <section class="section-container">
+      <div class="timeline" id="timeline"></div>
+  </section>
+
+  <footer class="footer">© 2025 SudoCell. Made with focus & balance.</footer>
+
+  <script>
+    const updates = [
+      {
+        title: "The Naming Quest is Over: Meet SudoCell!",
+        content: "After more than 10 days of intense research, brainstorming, and discovering that nearly every single good domain in the English language is already taken (seriously, try it!), we have finally landed on a name that feels right. The project is now officially <strong>SudoCell</strong>! It perfectly captures the mission: providing root-level <code>sudo</code> control with the precision and elegance of a living <code>cell</code>. The domain is secured, and the new identity is here to stay.",
+        date: "2025-08-08"
+      },
+      {
+        title: "Name Locked — Reveal after domain is ours!",
+        content: "Finally, the new name is locked, it will be revealed once the domain is registered",
+        date: "2025-08-05"
+      },
+      {
+        title: "I'm reconsidering the name",
+        content: "Well, I had selected the old name 'Tawzin' because I thought it was unique, but I found out that ChatGPT had given this name to others as well. 😀😀😀 Now I'm thinking of a new one on my own. Hopefully, this time I'll come up with something brandable and truly unique.",
+        date: "2025-07-22"
+      },
+      {
+        title: "Resume advancing the linux skills",
+        content: "After selecting the logo / name, i resumed my journey towards advancing my skills in linux",
+        date: "2025-06-11"
+      },
+      {
+        title: "Designed the project landing page",
+        content: "I would not lie, I may have designed the page but that chatgpt developed the page with just a prompt.",
+        date: "2025-06-10"
+      },
+       {
+        title: "Select Name / Logo / Branding",
+        content: "Today I selected the name 'Tawzin' which means someone who balances things, I selected the brand colors, and designed the logo,.",
+        date: "2025-06-09"
+      },
+      {
+        title: "Advancing my linux skills",
+        content: "Just trying to advance my skills to make sure i'm ready for the project.",
+        date: "2025-06-06"
+      },
+      {
+        title: "Project Direction Locked",
+        content: "Decided to build SudoCell as a free, modern cPanel, Plesk alternative. Clean, fast, and bloat-free.",
+        date: "2025-06-01"
+      }
+    ];
+
+    const timeline = document.getElementById('timeline');
+
+    updates.forEach((update, index) => {
+      const side = index % 2 === 0 ? 'left' : 'right';
+      const entry = document.createElement('div');
+      entry.className = `entry ${side}`;
+      entry.innerHTML = `
+        <div class="entry-content">
+          <h3>${update.title}</h3>
+          <p>${update.content}</p>
+          <time>${new Date(update.date).toDateString()}</time>
+        </div>
+      `;
+      timeline.appendChild(entry);
+    });
+  </script>
+
+</body>
+</html>
